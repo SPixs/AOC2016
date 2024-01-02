@@ -26,6 +26,10 @@ public class Day02 {
 
 		// Part 2
 		startTime = System.nanoTime();
+		code = "";
+		for (String line : lines) {
+			code += computeDigitPart2(start, line);
+		}
 		System.out.println("Result part 2 : " + code + " in " + TimeUnit.NANOSECONDS.toMillis((System.nanoTime() - startTime)) + "ms");
 	}
 
@@ -41,5 +45,32 @@ public class Day02 {
 			}
 		}
 		return digit;
+	}
+	
+	private static char computeDigitPart2(int start, String line) {
+		
+		String[] map = new String[] {
+				"#######",
+				"###1###",
+				"##234##",
+				"#56789#",
+				"##ABC##",
+				"###D###",
+				"#######",
+		};
+		
+		int x = 1;
+		int y = 3;
+		
+		for (char c : line.toCharArray()) {
+			switch (c) {
+				case 'U': if (map[y-1].charAt(x) != '#') y--; break;
+				case 'D': if (map[y+1].charAt(x) != '#') y++; break;
+				case 'L': if (map[y].charAt(x-1) != '#') x--; break;
+				case 'R': if (map[y].charAt(x+1) != '#') x++; break;
+				default: throw new IllegalStateException();
+			}
+		}
+		return map[y].charAt(x);
 	}
 }
