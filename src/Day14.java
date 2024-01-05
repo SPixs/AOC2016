@@ -17,7 +17,7 @@ public class Day14 {
 		
 		String salt = lines.get(0);
 		
-		salt = "abc";
+//		salt = "abc";
 		
 		// Part 1
 		long startTime = System.nanoTime();
