@@ -17,7 +17,7 @@ public class Day14 {
 		
 		String salt = lines.get(0);
 		
-//		salt = "abc";
+		salt = "abc";
 		
 		// Part 1
 		long startTime = System.nanoTime();
@@ -27,10 +27,10 @@ public class Day14 {
 		List<BigInteger> keysIndex = new ArrayList<BigInteger>();
 		
 		while (keysIndex.size() < 64) {
-			char[] hash = computeMD5(salt + index);
+			char[] hash = computeMD5(salt + index, false);
 			char tripleChar = getTripleChar(hash);
 			if (tripleChar != Character.MIN_VALUE) {
-				BigInteger fiveInARowIndex = checkForFiveInARow(index, tripleChar, salt);
+				BigInteger fiveInARowIndex = checkForFiveInARow(index, tripleChar, salt, false);
 				if (fiveInARowIndex != null) {
 					keysIndex.add(index);
 				}
@@ -38,17 +38,31 @@ public class Day14 {
 			index = index.add(BigInteger.ONE);
 		}
 		
-		// 22251 too high
 		System.out.println("Result part 1 : " + keysIndex.get(keysIndex.size()-1) + " in " + TimeUnit.NANOSECONDS.toMillis((System.nanoTime() - startTime)) + "ms");
 
 		// Part 2
+		index = BigInteger.ZERO;
+		keysIndex = new ArrayList<BigInteger>();
+		while (keysIndex.size() < 64) {
+			char[] hash = computeMD5(salt + index, true);
+			char tripleChar = getTripleChar(hash);
+			if (tripleChar != Character.MIN_VALUE) {
+				BigInteger fiveInARowIndex = checkForFiveInARow(index, tripleChar, salt, true);
+				if (fiveInARowIndex != null) {
+					keysIndex.add(index);
+					System.out.println(keysIndex);
+				}
+			}
+			index = index.add(BigInteger.ONE);
+		}
+		
 		startTime = System.nanoTime();
 		System.out.println("Result part 2 : " + result + " in " + TimeUnit.NANOSECONDS.toMillis((System.nanoTime() - startTime)) + "ms");
 	}
 	
-	private static BigInteger checkForFiveInARow(BigInteger index, char tripleChar, String salt) {
+	private static BigInteger checkForFiveInARow(BigInteger index, char tripleChar, String salt, boolean stretched) {
 		for (int i=1;i<=1000;i++) {
-			char[] hash = computeMD5(salt+(index.add(BigInteger.valueOf(i))));
+			char[] hash = computeMD5(salt+(index.add(BigInteger.valueOf(i))), stretched);
 			if (hasFiveInARow(hash, tripleChar)) return index.add(BigInteger.valueOf(i));
 		}
 		return null;
@@ -96,7 +110,7 @@ public class Day14 {
 	
 	private static MessageDigest md5 = null;
 	
-	public static char[] computeMD5(String message) {
+	public static char[] computeMD5(String message, boolean streched) {
 		// Get a MessageDigest object for the MD5 algorithm
 		try {
 			if (md5 == null) {
@@ -104,6 +118,11 @@ public class Day14 {
 			}
 			md5.reset();
 			md5.update(message.getBytes());
+			if (streched) {
+				for (int i=0;i<2016;i++) {
+					md5.update(message.getBytes());
+				}
+			}
 			
 		   return encodeHex(md5.digest());
 		} 
